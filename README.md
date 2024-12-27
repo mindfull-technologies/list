@@ -30,7 +30,7 @@ A collaborative list-making application built with [Next.js](https://nextjs.org/
 2. **Install Dependencies**:
 
    ```bash
-   npm install
+   npm install --legacy-peer-deps
    ```
 
 3. **Set Up Environment Variables**:
