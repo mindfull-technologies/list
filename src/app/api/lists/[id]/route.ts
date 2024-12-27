@@ -7,8 +7,9 @@ export async function GET(
 ) {
     const id = (await params).id;
 
+    const list = await sql`SELECT * FROM lists WHERE id = ${id}`;
     const items = await sql`SELECT * FROM list_items WHERE list_id = ${id}`;
-    return new Response(JSON.stringify(items), {
+    return new Response(JSON.stringify({ list: list[0], items }), {
         status: 200,
     });
 }

@@ -4,27 +4,36 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useState, useEffect } from 'react';
 
-interface ListItemsPageProps {
+interface ListItemProps {
     listId: string;
 }
 
-export default function ListItem({ listId }: ListItemsPageProps) {
-    const [items, setItems] = useState<
-        { id: string; name: string; quantity: number }[]
-    >([]);
+interface List {
+    id: string;
+    title: string;
+}
+
+interface Item {
+    id: string;
+    name: string;
+    quantity: number;
+}
+
+export default function ListItem({ listId }: ListItemProps) {
+    const [list, setList] = useState<List | null>(null);
+    const [items, setItems] = useState<Item[]>([]);
     const [newItem, setNewItem] = useState({ name: '', quantity: '1' });
 
     useEffect(() => {
-        fetchItems();
+        fetchListAndItems();
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [listId]);
 
-    const fetchItems = async () => {
+    const fetchListAndItems = async () => {
         const res = await fetch(`/api/lists/${listId}`);
-        console.log(res);
         const data = await res.json();
-        console.log('items', data);
-        setItems(data);
+        setList(data.list);
+        setItems(data.items);
     };
 
     const addItem = async () => {
@@ -39,12 +48,16 @@ export default function ListItem({ listId }: ListItemsPageProps) {
             body: JSON.stringify(payload),
         });
         setNewItem({ name: '', quantity: '1' });
-        fetchItems();
+        fetchListAndItems();
     };
+
+    if (!list) {
+        return <div>Loading...</div>;
+    }
 
     return (
         <div className="container mx-auto p-4">
-            <h1 className="text-2xl font-bold mb-4">Your List</h1>
+            <h1 className="text-2xl font-bold mb-4">{list.title}</h1>
             <div className="mb-6">
                 <Input
                     placeholder="Item Name"
@@ -78,7 +91,7 @@ export default function ListItem({ listId }: ListItemsPageProps) {
                     </li>
                 ))}
             </ul>
-            <Button onClick={fetchItems}>Refresh List</Button>
+            <Button onClick={fetchListAndItems}>Refresh List</Button>
         </div>
     );
 }
