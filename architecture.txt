@@ -1,0 +1,22 @@
+/list
+  |- /app
+  |    |- /api
+  |    |    |- /lists
+  |    |    |    |- route.ts         # API for list creation and retrieval
+  |    |    |- /lists/[id]
+  |    |         |- route.ts         # API for specific list and its items
+  |    |- /list/[id]
+  |    |     |- page.tsx             # List page with refresh functionality
+  |    |- page.tsx                   # Landing page
+  |
+  |- /components
+  |    |- /ui                        # shadcn components
+  |         |- button.tsx
+  |         |- input.tsx
+  |         |- card.tsx
+  |
+  |- /lib
+  |    |- db.ts                      # Neon serverless client setup
+  |
+  |- .env                            # Environment variables
+  |- package.json                    # Dependencies
