@@ -1,10 +1,10 @@
 import ListItem from '@/app/list/[id]/list-item';
 
-export default async function page({
-    params,
-}: {
+interface ListParams {
     params: Promise<{ id: string }>;
-}) {
+}
+
+export default async function List({ params }: ListParams) {
     const id = (await params).id;
 
     return <ListItem listId={id} />;
