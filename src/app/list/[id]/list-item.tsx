@@ -25,12 +25,17 @@ interface Item {
   id: string;
   name: string;
   quantity: number;
+  brought_by: string; // Adjusted to snake_case
 }
 
 export default function ListItem({ listId }: ListItemProps) {
   const [list, setList] = useState<List | null>(null);
   const [items, setItems] = useState<Item[]>([]);
-  const [newItem, setNewItem] = useState({ name: '', quantity: '1' });
+  const [newItem, setNewItem] = useState({
+    name: '',
+    quantity: '1',
+    brought_by: '', // Adjusted to snake_case
+  });
 
   useEffect(() => {
     fetchListAndItems();
@@ -55,7 +60,7 @@ export default function ListItem({ listId }: ListItemProps) {
       method: 'POST',
       body: JSON.stringify(payload),
     });
-    setNewItem({ name: '', quantity: '1' });
+    setNewItem({ name: '', quantity: '1', brought_by: '' });
     fetchListAndItems();
   };
 
@@ -69,16 +74,18 @@ export default function ListItem({ listId }: ListItemProps) {
         <h1 className='text-2xl font-bold mb-4'>{list.title}</h1>
         <div className='flex flex-col sm:flex-row gap-2 mb-6'>
           <div className='w-full'>
-            <span className='text-xs'>Enter the item name</span>
+            <span className='text-xs inline-block ml-1'>
+              Enter the item name
+            </span>
             <Input
               placeholder='Item Name'
               value={newItem.name}
               onChange={e => setNewItem({ ...newItem, name: e.target.value })}
             />
           </div>
-          <div className='flex items-end gap-2'>
-            <div>
-              <span className='text-xs'>Enter quantity</span>
+          <div className='flex flex-col xs:flex-row xs:items-end gap-2'>
+            <div className='w-full xs:w-16'>
+              <span className='text-xs inline-block ml-1'>Quantity</span>
               <Input
                 type='number'
                 placeholder='Quantity'
@@ -89,10 +96,24 @@ export default function ListItem({ listId }: ListItemProps) {
                     quantity: e.target.value,
                   })
                 }
-                className='w-20'
               />
             </div>
-            <Button onClick={addItem}>Add Item</Button>
+            <div className='w-full xs:w-40'>
+              <span className='text-xs inline-block ml-1'>Enter your name</span>
+              <Input
+                placeholder='Your Name'
+                value={newItem.brought_by}
+                onChange={e =>
+                  setNewItem({
+                    ...newItem,
+                    brought_by: e.target.value,
+                  })
+                }
+              />
+            </div>
+            <Button onClick={addItem} className='mt-4 xs:mt-0'>
+              Add Item
+            </Button>
           </div>
         </div>
         <Table>
@@ -100,6 +121,7 @@ export default function ListItem({ listId }: ListItemProps) {
             <TableRow>
               <TableHead className='w-full'>Item Name</TableHead>
               <TableHead className='w-24'>Quantity</TableHead>
+              <TableHead className='w-40'>Brought By</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -108,6 +130,9 @@ export default function ListItem({ listId }: ListItemProps) {
                 <TableCell className='w-full'>{item.name}</TableCell>
                 <TableCell className='w-24 text-center'>
                   {item.quantity}
+                </TableCell>
+                <TableCell className='min-w-28 xs:min-w-40'>
+                  {item.brought_by}
                 </TableCell>
               </TableRow>
             ))}

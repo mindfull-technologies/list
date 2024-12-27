@@ -20,9 +20,9 @@ export async function POST(
   { params }: { params: Promise<{ id: string }> }
 ) {
   const id = (await params).id;
-  const { name, quantity } = await req.json();
+  const { name, quantity, brought_by } = await req.json();
 
-  await sql`INSERT INTO list_items (list_id, name, quantity) VALUES (${id}, ${name}, ${quantity})`;
+  await sql`INSERT INTO list_items (list_id, name, quantity, brought_by) VALUES (${id}, ${name}, ${quantity}, ${brought_by})`;
   return new Response(JSON.stringify({ message: 'Item added successfully' }), {
     status: 200,
   });
