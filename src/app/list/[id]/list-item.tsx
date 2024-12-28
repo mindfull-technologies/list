@@ -25,7 +25,7 @@ interface Item {
   id: string;
   name: string;
   quantity: number;
-  brought_by: string; // Adjusted to snake_case
+  assigned_to: string;
 }
 
 export default function ListItem({ listId }: ListItemProps) {
@@ -34,7 +34,7 @@ export default function ListItem({ listId }: ListItemProps) {
   const [newItem, setNewItem] = useState({
     name: '',
     quantity: '1',
-    brought_by: '', // Adjusted to snake_case
+    assigned_to: '',
   });
 
   useEffect(() => {
@@ -60,7 +60,7 @@ export default function ListItem({ listId }: ListItemProps) {
       method: 'POST',
       body: JSON.stringify(payload),
     });
-    setNewItem({ name: '', quantity: '1', brought_by: '' });
+    setNewItem({ name: '', quantity: '1', assigned_to: '' });
     fetchListAndItems();
   };
 
@@ -99,14 +99,16 @@ export default function ListItem({ listId }: ListItemProps) {
               />
             </div>
             <div className='w-full xs:w-40'>
-              <span className='text-xs inline-block ml-1'>Enter your name</span>
+              <span className='text-xs inline-block ml-1'>
+                Assign to someone
+              </span>
               <Input
-                placeholder='Your Name'
-                value={newItem.brought_by}
+                placeholder='Responsible Person'
+                value={newItem.assigned_to}
                 onChange={e =>
                   setNewItem({
                     ...newItem,
-                    brought_by: e.target.value,
+                    assigned_to: e.target.value,
                   })
                 }
               />
@@ -121,7 +123,9 @@ export default function ListItem({ listId }: ListItemProps) {
             <TableRow>
               <TableHead className='w-full'>Item Name</TableHead>
               <TableHead className='w-24'>Quantity</TableHead>
-              <TableHead className='w-40'>Brought By</TableHead>
+              <TableHead className='min-w-28 xs:min-w-40'>
+                Assigned To
+              </TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -132,7 +136,7 @@ export default function ListItem({ listId }: ListItemProps) {
                   {item.quantity}
                 </TableCell>
                 <TableCell className='min-w-28 xs:min-w-40'>
-                  {item.brought_by}
+                  {item.assigned_to}
                 </TableCell>
               </TableRow>
             ))}
