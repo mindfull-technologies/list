@@ -11,6 +11,7 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { useState, useEffect } from 'react';
+import EditItemModal from '@/app/list/[id]/edit-item-modal';
 
 interface ListItemProps {
   listId: string;
@@ -21,21 +22,28 @@ interface List {
   title: string;
 }
 
-interface Item {
+export interface Item {
   id: string;
   name: string;
-  quantity: number;
+  quantity: number | string;
+  assigned_to: string;
+}
+
+interface NewItem {
+  name: string;
+  quantity: string;
   assigned_to: string;
 }
 
 export default function ListItem({ listId }: ListItemProps) {
   const [list, setList] = useState<List | null>(null);
   const [items, setItems] = useState<Item[]>([]);
-  const [newItem, setNewItem] = useState({
+  const [newItem, setNewItem] = useState<NewItem>({
     name: '',
     quantity: '1',
     assigned_to: '',
   });
+  const [editItem, setEditItem] = useState<Item | null>(null);
 
   useEffect(() => {
     fetchListAndItems();
@@ -49,8 +57,7 @@ export default function ListItem({ listId }: ListItemProps) {
     setItems(data.items);
   };
 
-  const addItem = async () => {
-    // Convert string to number
+  const handleAddListItem = async () => {
     const payload = {
       ...newItem,
       quantity: Number(newItem.quantity),
@@ -61,6 +68,32 @@ export default function ListItem({ listId }: ListItemProps) {
       body: JSON.stringify(payload),
     });
     setNewItem({ name: '', quantity: '1', assigned_to: '' });
+    fetchListAndItems();
+  };
+
+  const handleItemEdit = (item: Item) => {
+    setEditItem(item);
+  };
+
+  const handleItemDelete = async (id: string) => {
+    await fetch(`/api/lists/${listId}/items/${id}`, {
+      method: 'DELETE',
+    });
+    setEditItem(null);
+    fetchListAndItems();
+  };
+
+  const handleItemSave = async (item: Item) => {
+    const payload = {
+      ...item,
+      quantity: Number(item.quantity),
+    };
+
+    await fetch(`/api/lists/${listId}/items/${item.id}`, {
+      method: 'PUT',
+      body: JSON.stringify(payload),
+    });
+    setEditItem(null);
     fetchListAndItems();
   };
 
@@ -88,7 +121,7 @@ export default function ListItem({ listId }: ListItemProps) {
               <span className='text-xs inline-block ml-1'>Quantity</span>
               <Input
                 type='number'
-                placeholder='Quantity'
+                placeholder='Q'
                 value={newItem.quantity}
                 onChange={e =>
                   setNewItem({
@@ -113,7 +146,7 @@ export default function ListItem({ listId }: ListItemProps) {
                 }
               />
             </div>
-            <Button onClick={addItem} className='mt-4 xs:mt-0'>
+            <Button onClick={handleAddListItem} className='mt-4 xs:mt-0'>
               Add Item
             </Button>
           </div>
@@ -123,9 +156,10 @@ export default function ListItem({ listId }: ListItemProps) {
             <TableRow>
               <TableHead className='w-full'>Item Name</TableHead>
               <TableHead className='w-24'>Quantity</TableHead>
-              <TableHead className='min-w-28 xs:min-w-40'>
+              <TableHead className='min-w-28 sm:min-w-40'>
                 Assigned To
               </TableHead>
+              <TableHead className='w-24'>Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -135,8 +169,16 @@ export default function ListItem({ listId }: ListItemProps) {
                 <TableCell className='w-24 text-center'>
                   {item.quantity}
                 </TableCell>
-                <TableCell className='min-w-28 xs:min-w-40'>
+                <TableCell className='min-w-28 sm:min-w-40'>
                   {item.assigned_to}
+                </TableCell>
+                <TableCell className='w-24'>
+                  <Button
+                    onClick={() => handleItemEdit(item)}
+                    className='text-xs px-2 py-1'
+                  >
+                    Edit
+                  </Button>
                 </TableCell>
               </TableRow>
             ))}
@@ -148,6 +190,15 @@ export default function ListItem({ listId }: ListItemProps) {
           </Button>
         </div>
       </div>
+
+      {editItem && (
+        <EditItemModal
+          item={editItem}
+          onSave={handleItemSave}
+          onCancel={() => setEditItem(null)}
+          onDelete={handleItemDelete}
+        />
+      )}
     </section>
   );
 }
