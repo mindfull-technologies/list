@@ -1,0 +1,17 @@
+node_modules/
+dist/
+logs/
+build/
+.vscode/
+.idea/
+*.log
+*.log.*
+*.log-*
+*.log/*
+.next/
+out/
+.husky/
+.DS_Store
+*.swp
+*.bak
+*.tmp
